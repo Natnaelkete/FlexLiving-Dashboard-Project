@@ -31,8 +31,9 @@ services:
       - postgres
       - redis
     volumes:
-      - ./backend/src:/app/backend/src
+      - ./backend:/app/backend
       - ./packages:/app/packages
+      - /app/backend/node_modules
 
   frontend:
     build:
@@ -43,9 +44,9 @@ services:
     environment:
       NEXT_PUBLIC_API_URL: http://localhost:4000/api
     volumes:
-      - ./frontend/src:/app/frontend/src
-      - ./frontend/public:/app/frontend/public
+      - ./frontend:/app/frontend
       - ./packages:/app/packages
+      - /app/frontend/node_modules
 
 volumes:
   postgres_data:
