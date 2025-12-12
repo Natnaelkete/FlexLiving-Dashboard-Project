@@ -10,4 +10,6 @@ build
 .env.local
 .env.example
 AGENTS.md
+.AGENTS.md
 AGENT.md
+.AGENT.md
