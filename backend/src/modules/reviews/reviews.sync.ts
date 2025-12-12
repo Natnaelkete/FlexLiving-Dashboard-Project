@@ -1,13 +1,13 @@
-import { PrismaClient } from '@prisma/client';
-import { HostawayService } from './hostaway.service';
-import { normalizeHostawayReview } from './reviews.utils';
+import { PrismaClient } from "@prisma/client";
+import { HostawayService } from "./hostaway.service";
+import { normalizeHostawayReview } from "./reviews.utils";
 
 const prisma = new PrismaClient();
 const hostawayService = new HostawayService();
 
 export const syncReviews = async () => {
-  console.log('Starting reviews sync...');
-  
+  console.log("Starting reviews sync...");
+
   try {
     // 1. Fetch all reviews from Hostaway (mocked)
     // In a real scenario, we might need pagination or date filtering to fetch incremental updates
@@ -21,10 +21,10 @@ export const syncReviews = async () => {
 
     // 2. Upsert into Database
     for (const review of normalizedReviews) {
-      // We need to ensure the Listing exists first. 
-      // In a real app, we'd sync listings separately. 
+      // We need to ensure the Listing exists first.
+      // In a real app, we'd sync listings separately.
       // Here, we'll upsert the listing based on the review data.
-      
+
       await prisma.listing.upsert({
         where: { id: review.listingId },
         update: {
@@ -75,20 +75,21 @@ export const syncReviews = async () => {
             categories: {
               create: review.categories.map((c: any) => ({
                 category: c.category,
-                rating: c.rating
-              }))
-            }
+                rating: c.rating,
+              })),
+            },
           },
         });
         createdCount++;
       }
     }
 
-    console.log(`Sync complete. Created: ${createdCount}, Updated: ${updatedCount}`);
+    console.log(
+      `Sync complete. Created: ${createdCount}, Updated: ${updatedCount}`
+    );
     return { createdCount, updatedCount };
-
   } catch (error) {
-    console.error('Error syncing reviews:', error);
+    console.error("Error syncing reviews:", error);
     throw error;
   } finally {
     await prisma.$disconnect();
