@@ -1,268 +1,102 @@
-import { Request, Response } from "express";
-import { HostawayService } from "./hostaway.service";
-import { GoogleService, normalizeGoogleReview } from "./google.service";
-import { normalizeHostawayReview } from "./reviews.utils";
-import { redisClient } from "../../config/redis";
+import { Request, Response, NextFunction } from "express";
+import { ReviewsService } from "./reviews.service";
 import {
   GetReviewsQuery,
   GetAnalyticsQuery,
   ToggleSelectionBody,
 } from "./reviews.schema";
-import prisma from "../../lib/prisma";
-import { syncReviews } from "./reviews.sync";
 
-const hostawayService = new HostawayService();
-const googleService = new GoogleService();
-const CACHE_TTL = 300; // 5 minutes
+const reviewsService = new ReviewsService();
 
 export const getGoogleReviews = async (
   req: Request<{}, {}, {}, GetReviewsQuery>,
-  res: Response
+  res: Response,
+  next: NextFunction
 ) => {
   try {
-    const cacheKey = `reviews:google:${JSON.stringify(req.query)}`;
-
-    // Try cache
-    if (redisClient.isOpen) {
-      const cached = await redisClient.get(cacheKey);
-      if (cached) {
-        return res.json(JSON.parse(cached));
-      }
-    }
-
-    // Use listingId as placeId, or default to a mock ID
-    const placeId = req.query.listingId || "mock-place-id";
-    const rawResponse = await googleService.fetchReviews(placeId);
-    const normalizedReviews = rawResponse.result.reviews.map((r) =>
-      normalizeGoogleReview(r, placeId)
-    );
-
-    const response = {
-      data: normalizedReviews,
-      meta: {
-        total: normalizedReviews.length,
-        filtersApplied: req.query,
-      },
-    };
-
-    // Set cache
-    if (redisClient.isOpen) {
-      await redisClient.setEx(cacheKey, CACHE_TTL, JSON.stringify(response));
-    }
-
-    res.json(response);
+    const result = await reviewsService.getGoogleReviews(req.query);
+    res.json(result);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Internal Server Error" });
+    next(error);
   }
 };
 
 export const getHostawayReviews = async (
   req: Request<{}, {}, {}, GetReviewsQuery>,
-  res: Response
+  res: Response,
+  next: NextFunction
 ) => {
   try {
-    const cacheKey = `reviews:hostaway:${JSON.stringify(req.query)}`;
-
-    // Try cache
-    if (redisClient.isOpen) {
-      const cached = await redisClient.get(cacheKey);
-      if (cached) {
-        return res.json(JSON.parse(cached));
-      }
-    }
-
-    const rawResponse = await hostawayService.fetchReviews(req.query);
-    const normalizedReviews = rawResponse.result.map(normalizeHostawayReview);
-
-    const response = {
-      data: normalizedReviews,
-      meta: {
-        total: normalizedReviews.length,
-        filtersApplied: req.query,
-      },
-    };
-
-    // Set cache
-    if (redisClient.isOpen) {
-      await redisClient.setEx(cacheKey, CACHE_TTL, JSON.stringify(response));
-    }
-
-    res.json(response);
+    const result = await reviewsService.getHostawayReviews(req.query);
+    res.json(result);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Internal Server Error" });
+    next(error);
   }
 };
 
 export const getReviews = async (
   req: Request<{}, {}, {}, GetReviewsQuery>,
-  res: Response
+  res: Response,
+  next: NextFunction
 ) => {
   try {
-    const {
-      listingId,
-      type,
-      status,
-      minRating,
-      maxRating,
-      startDate,
-      endDate,
-      channel,
-      selectedForPublic,
-      search,
-      sortBy,
-      sortOrder,
-    } = req.query;
-
-    const where: any = {};
-
-    if (listingId) where.listingId = listingId;
-    if (type) where.type = type;
-    if (status) where.status = status;
-    if (channel) where.channel = channel;
-    if (selectedForPublic)
-      where.selectedForPublic = selectedForPublic === "true";
-
-    if (minRating || maxRating) {
-      where.overallRating = {};
-      if (minRating) where.overallRating.gte = minRating;
-      if (maxRating) where.overallRating.lte = maxRating;
-    }
-
-    if (startDate || endDate) {
-      where.submittedAt = {};
-      if (startDate) where.submittedAt.gte = new Date(startDate);
-      if (endDate) where.submittedAt.lte = new Date(endDate);
-    }
-
-    if (search) {
-      where.OR = [
-        { publicText: { contains: search, mode: "insensitive" } },
-        { guestName: { contains: search, mode: "insensitive" } },
-      ];
-    }
-
-    const orderBy: any = {};
-    if (sortBy) {
-      orderBy[sortBy] = sortOrder || "desc";
-    } else {
-      orderBy.submittedAt = "desc";
-    }
-
-    const reviews = await prisma.review.findMany({
-      where,
-      include: {
-        categories: true,
-        listing: true,
-      },
-      orderBy,
-    });
-
-    res.json({
-      data: reviews,
-      meta: {
-        total: reviews.length,
-        filtersApplied: req.query,
-      },
-    });
+    const result = await reviewsService.getReviews(req.query);
+    res.json(result);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Internal Server Error" });
-  }
-};
-
-export const getAnalytics = async (
-  req: Request<{}, {}, {}, GetAnalyticsQuery>,
-  res: Response
-) => {
-  try {
-    const { listingId, startDate, endDate } = req.query;
-    const where: any = {};
-    if (listingId) where.listingId = listingId;
-    if (startDate || endDate) {
-      where.submittedAt = {};
-      if (startDate) where.submittedAt.gte = new Date(startDate);
-      if (endDate) where.submittedAt.lte = new Date(endDate);
-    }
-
-    const [totalReviews, averageRating, ratingDistribution] = await Promise.all(
-      [
-        prisma.review.count({ where }),
-        prisma.review.aggregate({
-          where,
-          _avg: { overallRating: true },
-        }),
-        prisma.review.groupBy({
-          by: ["overallRating"],
-          where,
-          _count: { overallRating: true },
-        }),
-      ]
-    );
-
-    res.json({
-      totalReviews,
-      averageRating: averageRating._avg.overallRating || 0,
-      ratingDistribution: ratingDistribution.reduce(
-        (acc: Record<number, number>, curr: any) => {
-          if (curr.overallRating !== null) {
-            acc[curr.overallRating] = curr._count.overallRating;
-          }
-          return acc;
-        },
-        {} as Record<number, number>
-      ),
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Internal Server Error" });
+    next(error);
   }
 };
 
 export const toggleReviewSelection = async (
   req: Request<{ id: string }, {}, ToggleSelectionBody>,
-  res: Response
+  res: Response,
+  next: NextFunction
 ) => {
   try {
     const { id } = req.params;
     const { selectedForPublic } = req.body;
-
-    const review = await prisma.review.update({
-      where: { id },
-      data: { selectedForPublic },
-    });
-
-    res.json({ data: review });
+    const result = await reviewsService.toggleReviewSelection(id, selectedForPublic);
+    res.json(result);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Internal Server Error" });
+    next(error);
   }
 };
 
-export const getListings = async (req: Request, res: Response) => {
+export const triggerSync = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
-    const listings = await prisma.listing.findMany({
-      select: {
-        id: true,
-        name: true,
-        slug: true,
-        channel: true,
-      },
-    });
-    res.json(listings);
+    const result = await reviewsService.triggerSync();
+    res.json(result);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Internal Server Error" });
+    next(error);
   }
 };
 
-export const triggerSync = async (req: Request, res: Response) => {
+export const getAnalytics = async (
+  req: Request<{}, {}, {}, GetAnalyticsQuery>,
+  res: Response,
+  next: NextFunction
+) => {
   try {
-    const result = await syncReviews();
-    res.json({ message: "Sync completed", result });
+    const result = await reviewsService.getAnalytics(req.query);
+    res.json(result);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Sync failed" });
+    next(error);
+  }
+};
+
+export const getListings = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const result = await reviewsService.getListings();
+    res.json(result);
+  } catch (error) {
+    next(error);
   }
 };

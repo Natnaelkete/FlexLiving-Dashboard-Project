@@ -1,4 +1,5 @@
 import { Router } from "express";
+// Routes for reviews module
 import {
   getHostawayReviews,
   getGoogleReviews,
