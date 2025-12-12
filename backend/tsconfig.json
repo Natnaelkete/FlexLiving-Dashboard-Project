@@ -2,7 +2,7 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@flex-living/types": ["../packages/types/src/index.ts"]
+      "@flex-living/types": ["./src/types/index.ts"]
     },
     "target": "ES2020",
     "module": "commonjs",
