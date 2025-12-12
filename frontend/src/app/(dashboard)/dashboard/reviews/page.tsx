@@ -20,8 +20,8 @@ export default function ReviewsPage() {
   useEffect(() => {
     // Debounce could be added here, but for now relying on Redux thunk handling
     const timer = setTimeout(() => {
-        dispatch(fetchReviews(filters));
-        dispatch(fetchAnalytics(filters));
+      dispatch(fetchReviews(filters));
+      dispatch(fetchAnalytics(filters));
     }, 300);
     return () => clearTimeout(timer);
   }, [dispatch, filters]);
@@ -31,8 +31,10 @@ export default function ReviewsPage() {
   };
 
   const handleSort = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const [sortBy, sortOrder] = e.target.value.split('-');
-    dispatch(setFilters({ ...filters, sortBy, sortOrder: sortOrder as 'asc' | 'desc' }));
+    const [sortBy, sortOrder] = e.target.value.split("-");
+    dispatch(
+      setFilters({ ...filters, sortBy, sortOrder: sortOrder as "asc" | "desc" })
+    );
   };
 
   return (
@@ -40,18 +42,25 @@ export default function ReviewsPage() {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <h1 className="text-2xl font-bold text-gray-900">Reviews Management</h1>
         <div className="flex flex-wrap gap-2">
-          <input 
-            type="text" 
-            placeholder="Search reviews..." 
+          <input
+            type="text"
+            placeholder="Search reviews..."
             className="px-4 py-2 border border-gray-300 rounded-md text-sm"
             onChange={handleSearch}
-            defaultValue={filters.search || ''}
+            defaultValue={filters.search || ""}
           />
 
-          <select 
+          <select
             className="px-4 py-2 border border-gray-300 rounded-md text-sm"
-            onChange={(e) => dispatch(setFilters({ ...filters, listingId: e.target.value || undefined }))}
-            defaultValue={filters.listingId || ''}
+            onChange={(e) =>
+              dispatch(
+                setFilters({
+                  ...filters,
+                  listingId: e.target.value || undefined,
+                })
+              )
+            }
+            defaultValue={filters.listingId || ""}
           >
             <option value="">All Properties</option>
             {listings.map((listing) => (
@@ -60,11 +69,15 @@ export default function ReviewsPage() {
               </option>
             ))}
           </select>
-          
-          <select 
+
+          <select
             className="px-4 py-2 border border-gray-300 rounded-md text-sm"
-            onChange={(e) => dispatch(setFilters({ ...filters, channel: e.target.value || undefined }))}
-            defaultValue={filters.channel || ''}
+            onChange={(e) =>
+              dispatch(
+                setFilters({ ...filters, channel: e.target.value || undefined })
+              )
+            }
+            defaultValue={filters.channel || ""}
           >
             <option value="">All Channels</option>
             <option value="airbnb">Airbnb</option>
@@ -73,10 +86,19 @@ export default function ReviewsPage() {
             <option value="hostaway">Hostaway</option>
           </select>
 
-          <select 
+          <select
             className="px-4 py-2 border border-gray-300 rounded-md text-sm"
-            onChange={(e) => dispatch(setFilters({ ...filters, minRating: e.target.value ? Number(e.target.value) : undefined }))}
-            defaultValue={filters.minRating || ''}
+            onChange={(e) =>
+              dispatch(
+                setFilters({
+                  ...filters,
+                  minRating: e.target.value
+                    ? Number(e.target.value)
+                    : undefined,
+                })
+              )
+            }
+            defaultValue={filters.minRating || ""}
           >
             <option value="">All Ratings</option>
             <option value="5">5 Stars Only</option>
@@ -84,7 +106,7 @@ export default function ReviewsPage() {
             <option value="3">3+ Stars</option>
           </select>
 
-          <select 
+          <select
             className="px-4 py-2 border border-gray-300 rounded-md text-sm"
             onChange={handleSort}
             defaultValue="submittedAt-desc"

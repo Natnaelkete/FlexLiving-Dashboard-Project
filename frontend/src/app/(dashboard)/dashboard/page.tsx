@@ -19,7 +19,7 @@ export default function DashboardPage() {
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-bold text-gray-900">Dashboard Overview</h1>
-      
+
       <section>
         <h2 className="text-lg font-semibold text-gray-700 mb-4">Analytics</h2>
         <AnalyticsSummary />
@@ -27,7 +27,9 @@ export default function DashboardPage() {
 
       <section className="bg-white rounded-lg shadow overflow-hidden">
         <div className="p-6 border-b border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-900">Recent Reviews</h2>
+          <h2 className="text-lg font-semibold text-gray-900">
+            Recent Reviews
+          </h2>
         </div>
         <ReviewsTable />
       </section>
