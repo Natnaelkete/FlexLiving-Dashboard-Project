@@ -2,6 +2,12 @@ import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import { NormalizedReview } from "@flex-living/types";
 import api from "../lib/api";
 
+interface AnalyticsData {
+  totalReviews: number;
+  averageRating: number;
+  ratingDistribution: Record<number, number>;
+}
+
 interface ReviewsState {
   items: NormalizedReview[];
   status: "idle" | "loading" | "succeeded" | "failed";
@@ -10,6 +16,8 @@ interface ReviewsState {
     total: number;
     filtersApplied: any;
   };
+  analytics: AnalyticsData | null;
+  analyticsStatus: "idle" | "loading" | "succeeded" | "failed";
 }
 
 const initialState: ReviewsState = {
@@ -20,12 +28,22 @@ const initialState: ReviewsState = {
     total: 0,
     filtersApplied: {},
   },
+  analytics: null,
+  analyticsStatus: "idle",
 };
 
 export const fetchReviews = createAsyncThunk(
   "reviews/fetchReviews",
   async (params: any) => {
     const response = await api.get("/reviews", { params });
+    return response.data;
+  }
+);
+
+export const fetchAnalytics = createAsyncThunk(
+  "reviews/fetchAnalytics",
+  async (params: any) => {
+    const response = await api.get("/reviews/analytics", { params });
     return response.data;
   }
 );
@@ -63,6 +81,13 @@ const reviewsSlice = createSlice({
       .addCase(fetchReviews.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.error.message || "Failed to fetch reviews";
+      })
+      .addCase(fetchAnalytics.pending, (state) => {
+        state.analyticsStatus = "loading";
+      })
+      .addCase(fetchAnalytics.fulfilled, (state, action) => {
+        state.analyticsStatus = "succeeded";
+        state.analytics = action.payload;
       })
       .addCase(
         toggleReviewSelection.fulfilled,

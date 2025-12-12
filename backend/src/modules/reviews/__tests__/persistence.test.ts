@@ -22,6 +22,9 @@ jest.mock('../../../lib/prisma', () => ({
     update: jest.fn(),
     findUnique: jest.fn(),
     create: jest.fn(),
+    count: jest.fn(),
+    aggregate: jest.fn(),
+    groupBy: jest.fn(),
   },
   listing: {
     upsert: jest.fn(),
@@ -85,6 +88,24 @@ describe('Reviews Persistence & Selection', () => {
         .send({ selectedForPublic: 'invalid' }); // Invalid type
 
       expect(res.status).toBe(400);
+    });
+  });
+
+  describe('GET /api/reviews/analytics', () => {
+    it('should return analytics data', async () => {
+      (prisma.review.count as jest.Mock).mockResolvedValue(10);
+      (prisma.review.aggregate as jest.Mock).mockResolvedValue({ _avg: { overallRating: 4.5 } });
+      (prisma.review.groupBy as jest.Mock).mockResolvedValue([
+        { overallRating: 5, _count: { overallRating: 6 } },
+        { overallRating: 4, _count: { overallRating: 4 } }
+      ]);
+
+      const res = await request(app).get('/api/reviews/analytics');
+
+      expect(res.status).toBe(200);
+      expect(res.body.totalReviews).toBe(10);
+      expect(res.body.averageRating).toBe(4.5);
+      expect(res.body.ratingDistribution).toEqual({ '4': 4, '5': 6 });
     });
   });
 });

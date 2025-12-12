@@ -10,6 +10,9 @@ interface FiltersState {
   endDate?: string;
   channel?: string;
   selectedForPublic?: string; // 'true' | 'false'
+  search?: string;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
 }
 
 const initialState: FiltersState = {};

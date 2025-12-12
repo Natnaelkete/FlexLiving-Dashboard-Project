@@ -3,7 +3,7 @@ import { HostawayService } from './hostaway.service';
 import { GoogleService, normalizeGoogleReview } from './google.service';
 import { normalizeHostawayReview } from './reviews.utils';
 import { redisClient } from '../../config/redis';
-import { GetReviewsQuery, ToggleSelectionBody } from './reviews.schema';
+import { GetReviewsQuery, GetAnalyticsQuery, ToggleSelectionBody } from './reviews.schema';
 import prisma from '../../lib/prisma';
 import { syncReviews } from './reviews.sync';
 
@@ -85,7 +85,7 @@ export const getHostawayReviews = async (req: Request<{}, {}, {}, GetReviewsQuer
 
 export const getReviews = async (req: Request<{}, {}, {}, GetReviewsQuery>, res: Response) => {
   try {
-    const { listingId, type, status, minRating, maxRating, startDate, endDate, channel, selectedForPublic } = req.query;
+    const { listingId, type, status, minRating, maxRating, startDate, endDate, channel, selectedForPublic, search, sortBy, sortOrder } = req.query;
 
     const where: any = {};
 
@@ -107,15 +107,27 @@ export const getReviews = async (req: Request<{}, {}, {}, GetReviewsQuery>, res:
       if (endDate) where.submittedAt.lte = new Date(endDate);
     }
 
+    if (search) {
+      where.OR = [
+        { publicText: { contains: search, mode: 'insensitive' } },
+        { guestName: { contains: search, mode: 'insensitive' } }
+      ];
+    }
+
+    const orderBy: any = {};
+    if (sortBy) {
+      orderBy[sortBy] = sortOrder || 'desc';
+    } else {
+      orderBy.submittedAt = 'desc';
+    }
+
     const reviews = await prisma.review.findMany({
       where,
       include: {
         categories: true,
         listing: true
       },
-      orderBy: {
-        submittedAt: 'desc'
-      }
+      orderBy
     });
 
     res.json({
@@ -124,6 +136,46 @@ export const getReviews = async (req: Request<{}, {}, {}, GetReviewsQuery>, res:
         total: reviews.length,
         filtersApplied: req.query
       }
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+};
+
+export const getAnalytics = async (req: Request<{}, {}, {}, GetAnalyticsQuery>, res: Response) => {
+  try {
+    const { listingId, startDate, endDate } = req.query;
+    const where: any = {};
+    if (listingId) where.listingId = listingId;
+    if (startDate || endDate) {
+      where.submittedAt = {};
+      if (startDate) where.submittedAt.gte = new Date(startDate);
+      if (endDate) where.submittedAt.lte = new Date(endDate);
+    }
+
+    const [totalReviews, averageRating, ratingDistribution] = await Promise.all([
+      prisma.review.count({ where }),
+      prisma.review.aggregate({
+        where,
+        _avg: { overallRating: true }
+      }),
+      prisma.review.groupBy({
+        by: ['overallRating'],
+        where,
+        _count: { overallRating: true }
+      })
+    ]);
+
+    res.json({
+      totalReviews,
+      averageRating: averageRating._avg.overallRating || 0,
+      ratingDistribution: ratingDistribution.reduce((acc, curr) => {
+        if (curr.overallRating !== null) {
+          acc[curr.overallRating] = curr._count.overallRating;
+        }
+        return acc;
+      }, {} as Record<number, number>)
     });
   } catch (error) {
     console.error(error);
