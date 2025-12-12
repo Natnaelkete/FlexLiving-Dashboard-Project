@@ -1,7 +1,7 @@
 import express from "express";
 import cors from "cors";
 import helmet from "helmet";
-import { router } from "./routes";
+import { router } from "./routes/index";
 import { globalErrorHandler } from "./middleware/error.middleware";
 import { AppError } from "./lib/appError";
 
