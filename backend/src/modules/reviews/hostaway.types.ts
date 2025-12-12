@@ -14,7 +14,7 @@ export interface HostawayReview {
   valueRating?: number;
   isPublic: number; // 0 or 1
   status: string; // 'new', 'approved', etc.
-  type: 'guest_to_host' | 'host_to_guest';
+  type: "guest_to_host" | "host_to_guest";
 }
 
 export interface HostawayResponse {

@@ -1,11 +1,11 @@
 // Shared types will go here
 export interface NormalizedReview {
   id: string;
-  source: 'hostaway' | 'google';
+  source: "hostaway" | "google";
   listingId: string;
   listingName: string;
-  type: 'host-to-guest' | 'guest-to-host';
-  status: 'published' | 'pending' | 'rejected';
+  type: "host-to-guest" | "guest-to-host";
+  status: "published" | "pending" | "rejected";
   overallRating: number | null;
   categories: NormalizedReviewCategory[];
   publicText: string;

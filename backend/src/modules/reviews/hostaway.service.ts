@@ -1,4 +1,4 @@
-import { HostawayResponse, HostawayReview } from './hostaway.types';
+import { HostawayResponse, HostawayReview } from "./hostaway.types";
 
 const MOCK_REVIEWS: HostawayReview[] = [
   {
@@ -17,7 +17,7 @@ const MOCK_REVIEWS: HostawayReview[] = [
     valueRating: 4,
     isPublic: 1,
     status: "approved",
-    type: "guest_to_host"
+    type: "guest_to_host",
   },
   {
     id: 102,
@@ -35,7 +35,7 @@ const MOCK_REVIEWS: HostawayReview[] = [
     valueRating: 3,
     isPublic: 1,
     status: "approved",
-    type: "guest_to_host"
+    type: "guest_to_host",
   },
   {
     id: 103,
@@ -53,8 +53,8 @@ const MOCK_REVIEWS: HostawayReview[] = [
     valueRating: 1,
     isPublic: 1,
     status: "approved",
-    type: "guest_to_host"
-  }
+    type: "guest_to_host",
+  },
 ];
 
 export class HostawayService {
@@ -62,13 +62,13 @@ export class HostawayService {
   private apiKey: string;
 
   constructor() {
-    this.accountId = process.env.HOSTAWAY_ACCOUNT_ID || '';
-    this.apiKey = process.env.HOSTAWAY_API_KEY || '';
+    this.accountId = process.env.HOSTAWAY_ACCOUNT_ID || "";
+    this.apiKey = process.env.HOSTAWAY_API_KEY || "";
   }
 
   async fetchReviews(params: any): Promise<HostawayResponse> {
     // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 500));
+    await new Promise((resolve) => setTimeout(resolve, 500));
 
     // In a real implementation, we would use axios to fetch from Hostaway API
     // const response = await axios.get('https://api.hostaway.com/v1/reviews', { ... });
@@ -78,15 +78,17 @@ export class HostawayService {
     let filtered = [...MOCK_REVIEWS];
 
     if (params.listingId) {
-      filtered = filtered.filter(r => r.listingMapId === Number(params.listingId));
+      filtered = filtered.filter(
+        (r) => r.listingMapId === Number(params.listingId)
+      );
     }
-    
+
     // ... other filters
 
     return {
-      status: 'success',
+      status: "success",
       result: filtered,
-      total: filtered.length
+      total: filtered.length,
     };
   }
 }

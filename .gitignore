@@ -7,3 +7,6 @@ coverage
 out
 build
 .vscode
+.env.local
+.env.example
+AGENT.md

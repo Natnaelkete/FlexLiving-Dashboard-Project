@@ -1,10 +1,13 @@
-import { Router } from 'express';
-import { getHostawayReviews } from './reviews.controller';
+import { Router } from "express";
+import { getHostawayReviews, getReviews, toggleReviewSelection, triggerSync } from './reviews.controller';
 import { validate } from '../../middleware/validate';
-import { getReviewsSchema } from './reviews.schema';
+import { getReviewsSchema, toggleSelectionSchema } from './reviews.schema';
 
 const router = Router();
 
 router.get('/hostaway', validate(getReviewsSchema), getHostawayReviews);
+router.get('/', validate(getReviewsSchema), getReviews);
+router.patch('/:id/selection', validate(toggleSelectionSchema), toggleReviewSelection);
+router.post('/sync', triggerSync);
 
 export { router as reviewsRouter };

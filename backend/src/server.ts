@@ -1,6 +1,6 @@
-import dotenv from 'dotenv';
-import { app } from './app';
-import { connectRedis } from './config/redis';
+import dotenv from "dotenv";
+import { app } from "./app";
+import { connectRedis } from "./config/redis";
 
 dotenv.config();
 
