@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { HostawayService } from './hostaway.service';
+import { GoogleService, normalizeGoogleReview } from './google.service';
 import { normalizeHostawayReview } from './reviews.utils';
 import { redisClient } from '../../config/redis';
 import { GetReviewsQuery, ToggleSelectionBody } from './reviews.schema';
@@ -7,7 +8,45 @@ import prisma from '../../lib/prisma';
 import { syncReviews } from './reviews.sync';
 
 const hostawayService = new HostawayService();
+const googleService = new GoogleService();
 const CACHE_TTL = 300; // 5 minutes
+
+export const getGoogleReviews = async (req: Request<{}, {}, {}, GetReviewsQuery>, res: Response) => {
+  try {
+    const cacheKey = `reviews:google:${JSON.stringify(req.query)}`;
+    
+    // Try cache
+    if (redisClient.isOpen) {
+        const cached = await redisClient.get(cacheKey);
+        if (cached) {
+            return res.json(JSON.parse(cached));
+        }
+    }
+
+    // Use listingId as placeId, or default to a mock ID
+    const placeId = req.query.listingId || 'mock-place-id';
+    const rawResponse = await googleService.fetchReviews(placeId);
+    const normalizedReviews = rawResponse.result.reviews.map(r => normalizeGoogleReview(r, placeId));
+
+    const response = {
+      data: normalizedReviews,
+      meta: {
+        total: normalizedReviews.length,
+        filtersApplied: req.query
+      }
+    };
+
+    // Set cache
+    if (redisClient.isOpen) {
+        await redisClient.setEx(cacheKey, CACHE_TTL, JSON.stringify(response));
+    }
+
+    res.json(response);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+};
 
 export const getHostawayReviews = async (req: Request<{}, {}, {}, GetReviewsQuery>, res: Response) => {
   try {

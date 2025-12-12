@@ -1,6 +1,7 @@
 import request from "supertest";
 import { app } from "../../../app";
 import { normalizeHostawayReview } from "../reviews.utils";
+import { normalizeGoogleReview, GoogleReview } from "../google.service";
 import { HostawayReview } from "../hostaway.types";
 import { getReviewsSchema } from "../reviews.schema";
 
@@ -43,6 +44,39 @@ describe("Reviews Module", () => {
       expect(normalized.submittedAt).toBe(
         new Date("2023-01-01 12:00:00").toISOString()
       );
+    });
+
+    it("should normalize a Google review correctly", () => {
+      const mockGoogleReview: GoogleReview = {
+        author_name: "Jane Doe",
+        author_url: "http://google.com",
+        language: "en",
+        original_language: "en",
+        profile_photo_url: "http://photo.url",
+        rating: 4,
+        relative_time_description: "a week ago",
+        text: "Good stay",
+        time: 1672574400, // 2023-01-01 12:00:00 UTC
+        translated: false
+      };
+
+      const normalized = normalizeGoogleReview(mockGoogleReview, "place-123");
+
+      expect(normalized.source).toBe("google");
+      expect(normalized.listingId).toBe("place-123");
+      expect(normalized.overallRating).toBe(4);
+      expect(normalized.publicText).toBe("Good stay");
+      expect(normalized.submittedAt).toBe(new Date(1672574400 * 1000).toISOString());
+    });
+  });
+
+  describe("API Endpoints", () => {
+    it("GET /api/reviews/google should return mocked reviews", async () => {
+      const res = await request(app).get("/api/reviews/google");
+      expect(res.status).toBe(200);
+      expect(res.body.data).toBeDefined();
+      expect(Array.isArray(res.body.data)).toBe(true);
+      expect(res.body.data[0].source).toBe("google");
     });
   });
 
