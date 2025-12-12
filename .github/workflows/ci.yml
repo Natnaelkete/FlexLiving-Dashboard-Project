@@ -2,34 +2,45 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: ["master", "main"]
   pull_request:
-    branches: [main]
+    branches: ["master", "main"]
 
 jobs:
-  build:
+  build-and-test:
     runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x]
 
     steps:
       - uses: actions/checkout@v3
 
-      - name: Use Node.js
+      - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v3
         with:
-          node-version: "18.x"
+          node-version: ${{ matrix.node-version }}
           cache: "npm"
 
       - name: Install dependencies
         run: npm ci
 
-      - name: Build Shared Types
+      - name: Build Types
         run: npm run build --workspace=@flex-living/types
 
-      - name: Lint
-        run: npm run lint --workspaces
+      - name: Generate Prisma Client
+        run: npx prisma generate
+        working-directory: ./backend
 
-      - name: Type Check
-        run: npm run build --workspaces
+      - name: Run Backend Tests
+        run: npm test --workspace=backend
 
-      - name: Test
-        run: npm run test --workspaces
+      - name: Run Frontend Tests
+        run: npm test --workspace=frontend
+
+      - name: Build Backend
+        run: npm run build --workspace=backend
+
+      - name: Build Frontend
+        run: npm run build --workspace=frontend
