@@ -73,7 +73,7 @@ export const syncReviews = async () => {
             channel: review.channel,
             selectedForPublic: false, // Default
             categories: {
-              create: review.categories.map(c => ({
+              create: review.categories.map((c: any) => ({
                 category: c.category,
                 rating: c.rating
               }))
