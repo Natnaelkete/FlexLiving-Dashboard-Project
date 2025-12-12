@@ -11,7 +11,9 @@ export default function PropertiesPage() {
       <div className="bg-white rounded-lg shadow overflow-hidden">
         <div className="p-6 text-center text-gray-500">
           <p className="text-lg">Property management coming soon.</p>
-          <p className="text-sm mt-2">You will be able to manage your listings here.</p>
+          <p className="text-sm mt-2">
+            You will be able to manage your listings here.
+          </p>
         </div>
       </div>
     </div>
