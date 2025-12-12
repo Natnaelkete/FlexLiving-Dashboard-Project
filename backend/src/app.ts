@@ -8,8 +8,15 @@ import { AppError } from "./lib/appError";
 const app = express();
 
 app.use(helmet());
-app.use(cors());
+app.use(cors({
+  origin: "*", // Allow all origins for now to fix CORS issues
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
+}));
 app.use(express.json());
+
+// Handle preflight requests explicitly
+app.options("*", cors());
 
 // Mount router at /api for local development and explicit /api calls
 app.use("/api", router);
