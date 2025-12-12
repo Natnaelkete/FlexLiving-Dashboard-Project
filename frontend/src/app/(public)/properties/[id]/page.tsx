@@ -4,10 +4,15 @@ async function getPublicReviews(
   listingId: string
 ): Promise<NormalizedReview[]> {
   // Use internal URL for server-side fetches if available, otherwise fallback to public URL
-  const apiUrl =
+  let apiUrl =
     process.env.INTERNAL_API_URL ||
     process.env.NEXT_PUBLIC_API_URL ||
     "http://localhost:4000/api";
+
+  if (!apiUrl.startsWith("http")) {
+    apiUrl = `https://${apiUrl}`;
+  }
+
   const res = await fetch(
     `${apiUrl}/reviews?listingId=${listingId}&selectedForPublic=true`,
     {

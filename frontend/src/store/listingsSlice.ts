@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
+import api from "../lib/api";
 
 interface Listing {
   id: string;
@@ -20,12 +20,10 @@ const initialState: ListingsState = {
   error: null,
 };
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api";
-
 export const fetchListings = createAsyncThunk(
   "listings/fetchListings",
   async () => {
-    const response = await axios.get(`${API_URL}/reviews/listings`);
+    const response = await api.get("/reviews/listings");
     return response.data;
   }
 );
