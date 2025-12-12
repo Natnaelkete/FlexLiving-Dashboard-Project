@@ -1,6 +1,6 @@
-import { configureStore } from '@reduxjs/toolkit';
-import reviewsReducer from './reviewsSlice';
-import filtersReducer from './filtersSlice';
+import { configureStore } from "@reduxjs/toolkit";
+import reviewsReducer from "./reviewsSlice";
+import filtersReducer from "./filtersSlice";
 
 export const store = configureStore({
   reducer: {

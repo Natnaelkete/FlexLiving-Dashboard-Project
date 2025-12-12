@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import Link from "next/link";
 
 export function Sidebar() {
   return (
@@ -9,17 +9,26 @@ export function Sidebar() {
       <nav>
         <ul className="space-y-2">
           <li>
-            <Link href="/dashboard" className="block p-2 hover:bg-gray-800 rounded">
+            <Link
+              href="/dashboard"
+              className="block p-2 hover:bg-gray-800 rounded"
+            >
               Dashboard
             </Link>
           </li>
           <li>
-            <Link href="/dashboard/reviews" className="block p-2 hover:bg-gray-800 rounded">
+            <Link
+              href="/dashboard/reviews"
+              className="block p-2 hover:bg-gray-800 rounded"
+            >
               Reviews
             </Link>
           </li>
           <li>
-            <Link href="/dashboard/properties" className="block p-2 hover:bg-gray-800 rounded">
+            <Link
+              href="/dashboard/properties"
+              className="block p-2 hover:bg-gray-800 rounded"
+            >
               Properties
             </Link>
           </li>
