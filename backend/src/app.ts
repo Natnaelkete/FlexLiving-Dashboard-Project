@@ -11,7 +11,10 @@ app.use(helmet());
 app.use(cors());
 app.use(express.json());
 
+// Mount router at /api for local development and explicit /api calls
 app.use("/api", router);
+// Also mount at / for Vercel if it strips the /api prefix
+app.use("/", router);
 
 app.get("/health", (req, res) => {
   res.status(200).json({ status: "ok" });
