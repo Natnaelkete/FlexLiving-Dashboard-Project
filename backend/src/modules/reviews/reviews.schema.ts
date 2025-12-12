@@ -10,7 +10,7 @@ export const getReviewsSchema = z.object({
     startDate: z.string().datetime().optional(), // Expect ISO string
     endDate: z.string().datetime().optional(),
     channel: z.string().optional(),
-    selectedForPublic: z.enum(['true', 'false']).optional(), // Query params are strings
+    selectedForPublic: z.enum(["true", "false"]).optional(), // Query params are strings
     search: z.string().optional(),
     sortBy: z.enum(["submittedAt", "overallRating"]).optional(),
     sortOrder: z.enum(["asc", "desc"]).optional(),
@@ -34,6 +34,6 @@ export const toggleSelectionSchema = z.object({
   }),
 });
 
-export type GetReviewsQuery = z.infer<typeof getReviewsSchema>['query'];
-export type GetAnalyticsQuery = z.infer<typeof getAnalyticsSchema>['query'];
-export type ToggleSelectionBody = z.infer<typeof toggleSelectionSchema>['body'];
+export type GetReviewsQuery = z.infer<typeof getReviewsSchema>["query"];
+export type GetAnalyticsQuery = z.infer<typeof getAnalyticsSchema>["query"];
+export type ToggleSelectionBody = z.infer<typeof toggleSelectionSchema>["body"];

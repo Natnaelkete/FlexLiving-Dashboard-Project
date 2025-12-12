@@ -57,7 +57,7 @@ describe("Reviews Module", () => {
         relative_time_description: "a week ago",
         text: "Good stay",
         time: 1672574400, // 2023-01-01 12:00:00 UTC
-        translated: false
+        translated: false,
       };
 
       const normalized = normalizeGoogleReview(mockGoogleReview, "place-123");
@@ -66,7 +66,9 @@ describe("Reviews Module", () => {
       expect(normalized.listingId).toBe("place-123");
       expect(normalized.overallRating).toBe(4);
       expect(normalized.publicText).toBe("Good stay");
-      expect(normalized.submittedAt).toBe(new Date(1672574400 * 1000).toISOString());
+      expect(normalized.submittedAt).toBe(
+        new Date(1672574400 * 1000).toISOString()
+      );
     });
   });
 

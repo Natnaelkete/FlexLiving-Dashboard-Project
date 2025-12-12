@@ -12,7 +12,7 @@ interface FiltersState {
   selectedForPublic?: string; // 'true' | 'false'
   search?: string;
   sortBy?: string;
-  sortOrder?: 'asc' | 'desc';
+  sortOrder?: "asc" | "desc";
 }
 
 const initialState: FiltersState = {};
