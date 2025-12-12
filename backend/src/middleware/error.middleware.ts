@@ -4,13 +4,18 @@ import { ZodError } from "zod";
 import { Prisma } from "@prisma/client";
 
 const handleZodError = (err: ZodError) => {
-  const message = err.errors.map((e) => `${e.path.join(".")}: ${e.message}`).join(", ");
+  const message = err.errors
+    .map((e) => `${e.path.join(".")}: ${e.message}`)
+    .join(", ");
   return new AppError(`Invalid input data: ${message}`, 400);
 };
 
 const handlePrismaError = (err: Prisma.PrismaClientKnownRequestError) => {
   if (err.code === "P2002") {
-    return new AppError("Duplicate field value: please use another value!", 400);
+    return new AppError(
+      "Duplicate field value: please use another value!",
+      400
+    );
   }
   if (err.code === "P2025") {
     return new AppError("Record not found!", 404);
@@ -31,7 +36,8 @@ export const globalErrorHandler = (
   error.message = err.message;
 
   if (err instanceof ZodError) error = handleZodError(err);
-  if (err instanceof Prisma.PrismaClientKnownRequestError) error = handlePrismaError(err);
+  if (err instanceof Prisma.PrismaClientKnownRequestError)
+    error = handlePrismaError(err);
 
   // Development Error Response
   if (process.env.NODE_ENV === "development") {

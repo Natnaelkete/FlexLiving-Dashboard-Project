@@ -71,7 +71,10 @@ export function ReviewsTable() {
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {items.map((review: NormalizedReview) => (
-                <tr key={review.id} className="hover:bg-gray-50 transition-colors">
+                <tr
+                  key={review.id}
+                  className="hover:bg-gray-50 transition-colors"
+                >
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {new Date(review.submittedAt).toLocaleDateString()}
                   </td>
@@ -82,11 +85,15 @@ export function ReviewsTable() {
                     {review.listingName}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                      review.overallRating >= 4 ? 'bg-green-100 text-green-800' : 
-                      review.overallRating >= 3 ? 'bg-yellow-100 text-yellow-800' : 
-                      'bg-red-100 text-red-800'
-                    }`}>
+                    <span
+                      className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                        review.overallRating >= 4
+                          ? "bg-green-100 text-green-800"
+                          : review.overallRating >= 3
+                            ? "bg-yellow-100 text-yellow-800"
+                            : "bg-red-100 text-red-800"
+                      }`}
+                    >
                       {review.overallRating}/5
                     </span>
                   </td>
@@ -96,10 +103,15 @@ export function ReviewsTable() {
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     <button
                       onClick={() =>
-                        handleToggleSelection(review.id, review.selectedForPublic)
+                        handleToggleSelection(
+                          review.id,
+                          review.selectedForPublic
+                        )
                       }
                       className={`relative inline-flex items-center h-6 rounded-full w-11 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${
-                        review.selectedForPublic ? "bg-indigo-600" : "bg-gray-200"
+                        review.selectedForPublic
+                          ? "bg-indigo-600"
+                          : "bg-gray-200"
                       }`}
                     >
                       <span

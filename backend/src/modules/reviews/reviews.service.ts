@@ -174,25 +174,30 @@ export class ReviewsService {
       if (endDate) where.submittedAt.lte = new Date(endDate);
     }
 
-    const [totalReviews, averageRating, ratingDistribution] = await Promise.all([
-      prisma.review.count({ where }),
-      prisma.review.aggregate({
-        where,
-        _avg: { overallRating: true },
-      }),
-      prisma.review.groupBy({
-        by: ["overallRating"],
-        where,
-        _count: { overallRating: true },
-      }),
-    ]);
+    const [totalReviews, averageRating, ratingDistribution] = await Promise.all(
+      [
+        prisma.review.count({ where }),
+        prisma.review.aggregate({
+          where,
+          _avg: { overallRating: true },
+        }),
+        prisma.review.groupBy({
+          by: ["overallRating"],
+          where,
+          _count: { overallRating: true },
+        }),
+      ]
+    );
 
-    const distribution = ratingDistribution.reduce((acc, curr) => {
-      if (curr.overallRating) {
-        acc[curr.overallRating] = curr._count.overallRating;
-      }
-      return acc;
-    }, {} as Record<number, number>);
+    const distribution = ratingDistribution.reduce(
+      (acc, curr) => {
+        if (curr.overallRating) {
+          acc[curr.overallRating] = curr._count.overallRating;
+        }
+        return acc;
+      },
+      {} as Record<number, number>
+    );
 
     return {
       totalReviews,

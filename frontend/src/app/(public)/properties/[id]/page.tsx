@@ -4,7 +4,10 @@ async function getPublicReviews(
   listingId: string
 ): Promise<NormalizedReview[]> {
   // Use internal URL for server-side fetches if available, otherwise fallback to public URL
-  const apiUrl = process.env.INTERNAL_API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api";
+  const apiUrl =
+    process.env.INTERNAL_API_URL ||
+    process.env.NEXT_PUBLIC_API_URL ||
+    "http://localhost:4000/api";
   const res = await fetch(
     `${apiUrl}/reviews?listingId=${listingId}&selectedForPublic=true`,
     {
@@ -63,7 +66,9 @@ export default async function PropertyPage({
             </div>
             <div className="flex items-center bg-white/10 backdrop-blur-md px-4 py-2 rounded-lg border border-white/20">
               <span className="text-yellow-400 text-xl mr-2">★</span>
-              <span className="text-xl font-bold text-white">{averageRating}</span>
+              <span className="text-xl font-bold text-white">
+                {averageRating}
+              </span>
               <span className="text-gray-300 ml-2 text-sm">
                 ({reviews.length} reviews)
               </span>
@@ -78,21 +83,37 @@ export default async function PropertyPage({
           <div className="lg:col-span-2 space-y-12">
             {/* About Section */}
             <section>
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">About this space</h2>
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                About this space
+              </h2>
               <p className="text-gray-600 leading-relaxed text-lg">
-                Enjoy a stylish experience at this centrally-located place. 
-                Close to all amenities and transport links. Perfect for business 
+                Enjoy a stylish experience at this centrally-located place.
+                Close to all amenities and transport links. Perfect for business
                 travelers and couples looking for a convenient base.
               </p>
-              
+
               {/* Mock Amenities */}
               <div className="mt-6 grid grid-cols-2 gap-4">
-                {["Wifi", "Kitchen", "Workplace", "Air conditioning"].map((item) => (
-                  <div key={item} className="flex items-center text-gray-600">
-                    <svg className="w-5 h-5 mr-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
-                    {item}
-                  </div>
-                ))}
+                {["Wifi", "Kitchen", "Workplace", "Air conditioning"].map(
+                  (item) => (
+                    <div key={item} className="flex items-center text-gray-600">
+                      <svg
+                        className="w-5 h-5 mr-3 text-gray-400"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M5 13l4 4L19 7"
+                        ></path>
+                      </svg>
+                      {item}
+                    </div>
+                  )
+                )}
               </div>
             </section>
 
@@ -120,19 +141,30 @@ export default async function PropertyPage({
                       <div className="flex items-start justify-between mb-4">
                         <div className="flex items-center">
                           <div className="h-12 w-12 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg shadow-md">
-                            {review.guestName ? review.guestName.charAt(0) : "G"}
+                            {review.guestName
+                              ? review.guestName.charAt(0)
+                              : "G"}
                           </div>
                           <div className="ml-4">
                             <p className="text-base font-semibold text-gray-900">
                               {review.guestName || "Guest"}
                             </p>
                             <p className="text-sm text-gray-500">
-                              {new Date(review.submittedAt).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
+                              {new Date(review.submittedAt).toLocaleDateString(
+                                undefined,
+                                {
+                                  year: "numeric",
+                                  month: "long",
+                                  day: "numeric",
+                                }
+                              )}
                             </p>
                           </div>
                         </div>
                         <div className="flex items-center bg-gray-50 px-3 py-1 rounded-full border border-gray-200">
-                          <span className="text-yellow-500 mr-1.5 text-sm">★</span>
+                          <span className="text-yellow-500 mr-1.5 text-sm">
+                            ★
+                          </span>
                           <span className="text-sm font-bold text-gray-900">
                             {review.overallRating}
                           </span>
@@ -158,15 +190,17 @@ export default async function PropertyPage({
                 </div>
                 <div className="flex items-center text-sm text-gray-600">
                   <span className="text-yellow-500 mr-1">★</span>
-                  <span className="font-semibold text-gray-900 mr-1">{averageRating}</span>
+                  <span className="font-semibold text-gray-900 mr-1">
+                    {averageRating}
+                  </span>
                   <span className="underline">({reviews.length} reviews)</span>
                 </div>
               </div>
-              
+
               <button className="w-full bg-indigo-600 text-white py-3 rounded-lg font-semibold hover:bg-indigo-700 transition-colors mb-4">
                 Check Availability
               </button>
-              
+
               <p className="text-center text-xs text-gray-500">
                 You won't be charged yet
               </p>
@@ -183,7 +217,9 @@ export default async function PropertyPage({
             <span className="text-gray-500 text-sm"> / night</span>
             <div className="flex items-center text-xs text-gray-600 mt-1">
               <span className="text-yellow-500 mr-1">★</span>
-              <span className="font-semibold text-gray-900 mr-1">{averageRating}</span>
+              <span className="font-semibold text-gray-900 mr-1">
+                {averageRating}
+              </span>
             </div>
           </div>
           <button className="bg-indigo-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-indigo-700 transition-colors">

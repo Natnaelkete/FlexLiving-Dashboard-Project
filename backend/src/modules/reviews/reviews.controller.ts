@@ -55,7 +55,10 @@ export const toggleReviewSelection = async (
   try {
     const { id } = req.params;
     const { selectedForPublic } = req.body;
-    const result = await reviewsService.toggleReviewSelection(id, selectedForPublic);
+    const result = await reviewsService.toggleReviewSelection(
+      id,
+      selectedForPublic
+    );
     res.json(result);
   } catch (error) {
     next(error);
