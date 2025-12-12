@@ -170,7 +170,7 @@ export const getAnalytics = async (req: Request<{}, {}, {}, GetAnalyticsQuery>, 
     res.json({
       totalReviews,
       averageRating: averageRating._avg.overallRating || 0,
-      ratingDistribution: ratingDistribution.reduce((acc, curr) => {
+      ratingDistribution: ratingDistribution.reduce((acc: Record<number, number>, curr: any) => {
         if (curr.overallRating !== null) {
           acc[curr.overallRating] = curr._count.overallRating;
         }
