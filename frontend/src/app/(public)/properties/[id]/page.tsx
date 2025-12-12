@@ -1,4 +1,4 @@
-import { NormalizedReview } from "@flex-living/types";
+import { NormalizedReview } from "@/types";
 
 async function getPublicReviews(
   listingId: string

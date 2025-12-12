@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
-import { NormalizedReview } from "@flex-living/types";
+import { NormalizedReview } from "@/types";
 import api from "../lib/api";
 
 interface AnalyticsData {

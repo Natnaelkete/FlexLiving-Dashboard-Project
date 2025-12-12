@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store";
 import { fetchReviews, toggleReviewSelection } from "@/store/reviewsSlice";
-import { NormalizedReview } from "@flex-living/types";
+import { NormalizedReview } from "@/types";
 import { ReviewDetailModal } from "./ReviewDetailModal";
 
 export function ReviewsTable() {

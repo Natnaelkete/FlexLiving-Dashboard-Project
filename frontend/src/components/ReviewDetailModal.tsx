@@ -1,6 +1,6 @@
 "use client";
 
-import { NormalizedReview } from "@flex-living/types";
+import { NormalizedReview } from "@/types";
 
 interface ReviewDetailModalProps {
   review: NormalizedReview | null;
