@@ -1,8 +1,8 @@
 import { Router } from 'express';
+import { reviewsRouter } from '../modules/reviews/reviews.routes';
 
 const router = Router();
 
-// Placeholder for routes
-// router.use('/reviews', reviewsRouter);
+router.use('/reviews', reviewsRouter);
 
 export { router };

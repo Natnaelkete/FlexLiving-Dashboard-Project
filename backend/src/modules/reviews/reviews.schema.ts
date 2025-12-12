@@ -1,0 +1,16 @@
+import { z } from 'zod';
+
+export const getReviewsSchema = z.object({
+  query: z.object({
+    listingId: z.string().optional(),
+    type: z.enum(['guest-to-host', 'host-to-guest']).optional(),
+    status: z.enum(['published', 'pending', 'rejected']).optional(),
+    minRating: z.coerce.number().min(1).max(5).optional(),
+    maxRating: z.coerce.number().min(1).max(5).optional(),
+    startDate: z.string().datetime().optional(), // Expect ISO string
+    endDate: z.string().datetime().optional(),
+    channel: z.string().optional(),
+  }),
+});
+
+export type GetReviewsQuery = z.infer<typeof getReviewsSchema>['query'];
