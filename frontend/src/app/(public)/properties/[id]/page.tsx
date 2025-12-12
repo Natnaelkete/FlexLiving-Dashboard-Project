@@ -35,7 +35,7 @@ export default async function PropertyPage({
   const averageRating =
     reviews.length > 0
       ? (
-          reviews.reduce((acc, review) => acc + review.overallRating, 0) /
+          reviews.reduce((acc, review) => acc + (review.overallRating || 0), 0) /
           reviews.length
         ).toFixed(1)
       : "New";
