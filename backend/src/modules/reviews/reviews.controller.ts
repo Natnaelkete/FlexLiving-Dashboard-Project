@@ -240,6 +240,23 @@ export const toggleReviewSelection = async (
   }
 };
 
+export const getListings = async (req: Request, res: Response) => {
+  try {
+    const listings = await prisma.listing.findMany({
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        channel: true,
+      },
+    });
+    res.json(listings);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
 export const triggerSync = async (req: Request, res: Response) => {
   try {
     const result = await syncReviews();
