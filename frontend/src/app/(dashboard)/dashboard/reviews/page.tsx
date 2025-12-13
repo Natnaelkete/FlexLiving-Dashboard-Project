@@ -7,6 +7,7 @@ import {
   fetchReviews,
   fetchAnalytics,
   fetchHostawayReviews,
+  fetchGoogleReviews,
 } from "@/store/reviewsSlice";
 import { fetchListings } from "@/store/listingsSlice";
 import { setFilters } from "@/store/filtersSlice";
@@ -24,8 +25,12 @@ export default function ReviewsPage() {
   useEffect(() => {
     // Debounce could be added here, but for now relying on Redux thunk handling
     const timer = setTimeout(() => {
+      // If specifically filtering for Google
+      if (filters.channel === "google") {
+        dispatch(fetchGoogleReviews(filters));
+      }
       // If specifically filtering for Hostaway or no source is set (default), fetch live data
-      if (filters.source === "hostaway" || !filters.source) {
+      else if (filters.source === "hostaway" || !filters.source) {
         dispatch(fetchHostawayReviews(filters));
       } else {
         dispatch(fetchReviews(filters));

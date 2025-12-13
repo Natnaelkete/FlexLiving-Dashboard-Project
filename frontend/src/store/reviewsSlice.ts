@@ -68,6 +68,14 @@ export const fetchHostawayReviews = createAsyncThunk(
   }
 );
 
+export const fetchGoogleReviews = createAsyncThunk(
+  "reviews/fetchGoogleReviews",
+  async (params: any) => {
+    const response = await api.get("/reviews/google", { params });
+    return response.data;
+  }
+);
+
 export const toggleReviewSelection = createAsyncThunk(
   "reviews/toggleSelection",
   async ({
@@ -139,6 +147,19 @@ const reviewsSlice = createSlice({
         state.status = "failed";
         state.error =
           action.error.message || "Failed to fetch Hostaway reviews";
+      })
+      .addCase(fetchGoogleReviews.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(fetchGoogleReviews.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.items = action.payload.data;
+        state.meta = action.payload.meta;
+      })
+      .addCase(fetchGoogleReviews.rejected, (state, action) => {
+        state.status = "failed";
+        state.error =
+          action.error.message || "Failed to fetch Google reviews";
       })
       .addCase(fetchPublicReviews.fulfilled, (state, action) => {
         state.publicReviews = action.payload.data;

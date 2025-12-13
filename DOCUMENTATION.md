@@ -98,8 +98,9 @@ Triggers a background synchronization job.
 
 ### Implementation Status
 
-- **Implemented**: `GoogleService` with fetching and normalization logic.
+- **Implemented**: `GoogleService` with fetching and normalization logic (currently using **Mock Data** for development).
 - **Implemented**: Caching strategy to minimize API costs.
+- **Pending**: Integration with live Google Places API (replacing mock data).
 - **Pending**: Automated background job (Cron) to sync Google reviews nightly (currently manual trigger).
 
 ---

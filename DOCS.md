@@ -47,7 +47,11 @@ We map Google reviews to our `NormalizedReview` interface:
 ## Implementation Status
 
 - **Backend**:
-  - `GoogleService` created with mock data.
+  - `GoogleService` created with **Mock Data** implementation.
+  - Currently returns simulated reviews (`MOCK_GOOGLE_REVIEWS`) to facilitate frontend development and testing without incurring Google Maps Platform API costs.
+  - **Behavior**: Includes a simulated **500ms network delay** to test frontend loading states.
+  - Mock data includes realistic fields (`author_name`, `rating`, `text`, `time`) to verify normalization logic.
+  - **Next Steps**: Replace mock return with actual `axios` call to Google Places API using `GOOGLE_PLACES_API_KEY`.
   - `getGoogleReviews` controller method added.
   - Route `GET /api/reviews/google` exposed.
 - **Frontend**:
