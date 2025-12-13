@@ -3,7 +3,11 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store";
-import { fetchReviews, fetchAnalytics, fetchHostawayReviews } from "@/store/reviewsSlice";
+import {
+  fetchReviews,
+  fetchAnalytics,
+  fetchHostawayReviews,
+} from "@/store/reviewsSlice";
 import { fetchListings } from "@/store/listingsSlice";
 import { setFilters } from "@/store/filtersSlice";
 import { ReviewsTable } from "@/components/ReviewsTable";
@@ -22,9 +26,9 @@ export default function ReviewsPage() {
     const timer = setTimeout(() => {
       // If specifically filtering for Hostaway or no source is set (default), fetch live data
       if (filters.source === "hostaway" || !filters.source) {
-         dispatch(fetchHostawayReviews(filters));
+        dispatch(fetchHostawayReviews(filters));
       } else {
-         dispatch(fetchReviews(filters));
+        dispatch(fetchReviews(filters));
       }
       dispatch(fetchAnalytics(filters));
     }, 300);

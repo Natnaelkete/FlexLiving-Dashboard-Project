@@ -100,7 +100,8 @@ const reviewsSlice = createSlice({
       })
       .addCase(fetchHostawayReviews.rejected, (state, action) => {
         state.status = "failed";
-        state.error = action.error.message || "Failed to fetch Hostaway reviews";
+        state.error =
+          action.error.message || "Failed to fetch Hostaway reviews";
       })
       .addCase(fetchAnalytics.pending, (state) => {
         state.analyticsStatus = "loading";
