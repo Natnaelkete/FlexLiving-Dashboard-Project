@@ -15,7 +15,6 @@ import {
 
 const navItems = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { name: "Properties", href: "/dashboard/properties", icon: Home },
   { name: "Reviews", href: "/dashboard/reviews", icon: MessageSquare },
 ];
 
