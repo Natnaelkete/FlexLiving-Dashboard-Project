@@ -17,9 +17,21 @@ export function ReviewsTable() {
     null
   );
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [toggleError, setToggleError] = useState<string | null>(null);
 
-  const handleToggleSelection = (id: string, currentStatus: boolean) => {
-    dispatch(toggleReviewSelection({ id, selectedForPublic: !currentStatus }));
+  const handleToggleSelection = async (
+    id: string,
+    currentStatus: boolean,
+    review: NormalizedReview
+  ) => {
+    setToggleError(null);
+    try {
+      await dispatch(
+        toggleReviewSelection({ id, selectedForPublic: !currentStatus, review })
+      ).unwrap();
+    } catch (err: any) {
+      setToggleError(err.message || "Failed to toggle review selection");
+    }
   };
 
   const handleViewDetails = (review: NormalizedReview) => {
@@ -48,6 +60,11 @@ export function ReviewsTable() {
 
   return (
     <>
+      {toggleError && (
+        <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+          <p className="text-red-800 text-sm font-medium">{toggleError}</p>
+        </div>
+      )}
       <div className="overflow-hidden bg-white rounded-lg shadow border border-gray-200">
         <div className="overflow-x-auto scrollbar-hide">
           <table className="min-w-full divide-y divide-gray-200">
@@ -112,13 +129,12 @@ export function ReviewsTable() {
                       onClick={() =>
                         handleToggleSelection(
                           review.id,
-                          review.selectedForPublic
+                          review.selectedForPublic,
+                          review
                         )
                       }
-                      className={`relative inline-flex items-center h-6 rounded-full w-11 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 cursor-pointer ${
-                        review.selectedForPublic
-                          ? "bg-indigo-600"
-                          : "bg-gray-200"
+                      className={`relative inline-flex items-center h-6 rounded-full w-11 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 cursor-pointer ${
+                        review.selectedForPublic ? "bg-gray-900" : "bg-gray-200"
                       }`}
                     >
                       <span
@@ -133,7 +149,7 @@ export function ReviewsTable() {
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <button
                       onClick={() => handleViewDetails(review)}
-                      className="text-indigo-600 hover:text-indigo-900 bg-indigo-50 hover:bg-indigo-100 px-3 py-1 rounded-md transition-colors cursor-pointer"
+                      className="text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 px-3 py-1.5 rounded-md text-xs font-medium transition-colors cursor-pointer"
                     >
                       View Details
                     </button>

@@ -54,12 +54,13 @@ export const toggleReviewSelection = async (
 ) => {
   try {
     const { id } = req.params;
-    const { selectedForPublic } = req.body;
+    const { selectedForPublic, ...reviewData } = req.body;
     const result = await reviewsService.toggleReviewSelection(
       id,
-      selectedForPublic
+      selectedForPublic,
+      reviewData
     );
-    res.json(result);
+    res.json({ data: result });
   } catch (error) {
     next(error);
   }

@@ -31,6 +31,17 @@ export const toggleSelectionSchema = z.object({
   }),
   body: z.object({
     selectedForPublic: z.boolean(),
+    // Optional fields for upserting if missing
+    source: z.string().optional(),
+    listingId: z.string().optional(),
+    type: z.string().optional(),
+    status: z.string().optional(),
+    overallRating: z.number().nullable().optional(),
+    publicText: z.string().nullable().optional(),
+    submittedAt: z.string().optional(),
+    guestName: z.string().nullable().optional(),
+    channel: z.string().optional(),
+    listingName: z.string().optional(),
   }),
 });
 

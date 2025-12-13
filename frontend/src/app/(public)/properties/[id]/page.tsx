@@ -48,7 +48,7 @@ export default async function PropertyPage({
       : "New";
 
   return (
-    <div className="min-h-screen bg-gray-50 font-sans">
+    <div className="min-h-screen bg-white font-sans">
       {/* Hero Section */}
       <div className="relative h-[50vh] min-h-[400px] w-full overflow-hidden">
         <img
@@ -56,11 +56,11 @@ export default async function PropertyPage({
           alt="Property Hero"
           className="absolute inset-0 h-full w-full object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
         <div className="absolute bottom-0 left-0 right-0 p-8 sm:p-12 max-w-7xl mx-auto">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
             <div>
-              <span className="inline-block px-3 py-1 mb-4 text-xs font-semibold tracking-wider text-white uppercase bg-indigo-600 rounded-full">
+              <span className="inline-block px-3 py-1 mb-4 text-xs font-bold tracking-wider text-white uppercase bg-gray-900 rounded-md">
                 Premium Stay
               </span>
               <h1 className="text-4xl sm:text-5xl font-bold text-white mb-2 shadow-sm">
@@ -147,7 +147,7 @@ export default async function PropertyPage({
                     >
                       <div className="flex items-start justify-between mb-4">
                         <div className="flex items-center">
-                          <div className="h-12 w-12 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg shadow-md">
+                          <div className="h-12 w-12 rounded-full bg-gray-900 flex items-center justify-center text-white font-bold text-lg shadow-sm">
                             {review.guestName
                               ? review.guestName.charAt(0)
                               : "G"}
@@ -189,7 +189,7 @@ export default async function PropertyPage({
 
           {/* Right Column: Sticky Booking Card (Mock) */}
           <div className="hidden lg:block">
-            <div className="sticky top-8 bg-white p-6 rounded-2xl border border-gray-200 shadow-lg">
+            <div className="sticky top-8 bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
               <div className="flex justify-between items-end mb-6">
                 <div>
                   <span className="text-2xl font-bold text-gray-900">$120</span>
@@ -204,7 +204,7 @@ export default async function PropertyPage({
                 </div>
               </div>
 
-              <button className="w-full bg-indigo-600 text-white py-3 rounded-lg font-semibold hover:bg-indigo-700 transition-colors mb-4">
+              <button className="w-full bg-gray-900 text-white py-3 rounded-lg font-semibold hover:bg-black transition-colors mb-4">
                 Check Availability
               </button>
 
@@ -229,7 +229,7 @@ export default async function PropertyPage({
               </span>
             </div>
           </div>
-          <button className="bg-indigo-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-indigo-700 transition-colors">
+          <button className="bg-gray-900 text-white px-6 py-3 rounded-lg font-semibold hover:bg-black transition-colors">
             Check Availability
           </button>
         </div>

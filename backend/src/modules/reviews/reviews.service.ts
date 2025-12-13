@@ -49,26 +49,47 @@ export class ReviewsService {
 
   async getHostawayReviews(query: GetReviewsQuery) {
     const cacheKey = `reviews:hostaway:${JSON.stringify(query)}`;
+    let response;
 
     if (redisClient.isOpen) {
       const cached = await redisClient.get(cacheKey);
-      if (cached) return JSON.parse(cached);
+      if (cached) {
+        response = JSON.parse(cached);
+      }
     }
 
-    const rawResponse = await this.hostawayService.fetchReviews(query);
-    const normalizedReviews = rawResponse.result.map(normalizeHostawayReview);
+    if (!response) {
+      const rawResponse = await this.hostawayService.fetchReviews(query);
+      const normalizedReviews = rawResponse.result.map(normalizeHostawayReview);
 
-    const response = {
-      data: normalizedReviews,
-      meta: {
-        total: normalizedReviews.length,
-        filtersApplied: query,
-      },
-    };
+      response = {
+        data: normalizedReviews,
+        meta: {
+          total: normalizedReviews.length,
+          filtersApplied: query,
+        },
+      };
 
-    if (redisClient.isOpen) {
-      await redisClient.setEx(cacheKey, CACHE_TTL, JSON.stringify(response));
+      if (redisClient.isOpen) {
+        await redisClient.setEx(cacheKey, CACHE_TTL, JSON.stringify(response));
+      }
     }
+
+    // Merge with local DB status
+    const reviewIds = response.data.map((r: any) => r.id);
+    const localReviews = await prisma.review.findMany({
+      where: { id: { in: reviewIds } },
+      select: { id: true, selectedForPublic: true },
+    });
+
+    const localStatusMap = new Map(
+      localReviews.map((r) => [r.id, r.selectedForPublic])
+    );
+
+    response.data = response.data.map((r: any) => ({
+      ...r,
+      selectedForPublic: localStatusMap.get(r.id) || false,
+    }));
 
     return response;
   }
@@ -147,16 +168,67 @@ export class ReviewsService {
     };
   }
 
-  async toggleReviewSelection(id: string, selectedForPublic: boolean) {
+  async toggleReviewSelection(
+    id: string,
+    selectedForPublic: boolean,
+    reviewData?: any
+  ) {
     const review = await prisma.review.findUnique({ where: { id } });
+
     if (!review) {
-      throw new AppError("Review not found", 404);
+      if (reviewData && reviewData.listingId) {
+        // Ensure listing exists
+        await prisma.listing.upsert({
+          where: { id: String(reviewData.listingId) },
+          update: reviewData.listingName
+            ? { name: reviewData.listingName }
+            : {},
+          create: {
+            id: String(reviewData.listingId),
+            name: reviewData.listingName || "Unknown Listing",
+            channel: reviewData.channel,
+          },
+        });
+
+        // Create review
+        const newReview = await prisma.review.create({
+          data: {
+            id,
+            selectedForPublic,
+            source: reviewData.source || "Hostaway",
+            listingId: String(reviewData.listingId),
+            type: reviewData.type || "guest-to-host",
+            status: reviewData.status || "published",
+            overallRating: reviewData.overallRating,
+            publicText: reviewData.publicText,
+            submittedAt: new Date(reviewData.submittedAt || Date.now()),
+            guestName: reviewData.guestName,
+            channel: reviewData.channel,
+          },
+          include: { listing: true },
+        });
+
+        return {
+          ...newReview,
+          listingName: newReview.listing?.name,
+        };
+      }
+      throw new AppError(
+        "Review not found and no data provided for creation",
+        404
+      );
     }
 
-    return await prisma.review.update({
+    const updatedReview = await prisma.review.update({
       where: { id },
       data: { selectedForPublic },
+      include: { listing: true },
     });
+
+    return {
+      ...updatedReview,
+      listingName: updatedReview.listing?.name,
+    };
   }
 
   async triggerSync() {

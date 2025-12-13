@@ -10,6 +10,7 @@ interface AnalyticsData {
 
 interface ReviewsState {
   items: NormalizedReview[];
+  publicReviews: NormalizedReview[];
   status: "idle" | "loading" | "succeeded" | "failed";
   error: string | null;
   meta: {
@@ -22,6 +23,7 @@ interface ReviewsState {
 
 const initialState: ReviewsState = {
   items: [],
+  publicReviews: [],
   status: "idle",
   error: null,
   meta: {
@@ -36,6 +38,16 @@ export const fetchReviews = createAsyncThunk(
   "reviews/fetchReviews",
   async (params: any) => {
     const response = await api.get("/reviews", { params });
+    return response.data;
+  }
+);
+
+export const fetchPublicReviews = createAsyncThunk(
+  "reviews/fetchPublicReviews",
+  async () => {
+    const response = await api.get("/reviews", {
+      params: { selectedForPublic: true },
+    });
     return response.data;
   }
 );
@@ -61,13 +73,38 @@ export const toggleReviewSelection = createAsyncThunk(
   async ({
     id,
     selectedForPublic,
+    review,
   }: {
     id: string;
     selectedForPublic: boolean;
+    review?: NormalizedReview;
   }) => {
-    const response = await api.patch(`/reviews/${id}/selection`, {
-      selectedForPublic,
-    });
+    const allowedFields = [
+      "source",
+      "listingId",
+      "type",
+      "status",
+      "overallRating",
+      "publicText",
+      "submittedAt",
+      "guestName",
+      "channel",
+      "listingName",
+    ];
+
+    const filteredReview: any = { selectedForPublic };
+    if (review) {
+      allowedFields.forEach((field) => {
+        if (field in review) {
+          filteredReview[field] = (review as any)[field];
+        }
+      });
+    }
+
+    const response = await api.patch(
+      `/reviews/${id}/selection`,
+      filteredReview
+    );
     return response.data.data;
   }
 );
@@ -103,6 +140,9 @@ const reviewsSlice = createSlice({
         state.error =
           action.error.message || "Failed to fetch Hostaway reviews";
       })
+      .addCase(fetchPublicReviews.fulfilled, (state, action) => {
+        state.publicReviews = action.payload.data;
+      })
       .addCase(fetchAnalytics.pending, (state) => {
         state.analyticsStatus = "loading";
       })
@@ -113,14 +153,33 @@ const reviewsSlice = createSlice({
       .addCase(
         toggleReviewSelection.fulfilled,
         (state, action: PayloadAction<NormalizedReview>) => {
-          const index = state.items.findIndex(
-            (r) => r.id === action.payload.id
-          );
+          const updatedReview = action.payload;
+
+          // Update items list
+          const index = state.items.findIndex((r) => r.id === updatedReview.id);
           if (index !== -1) {
-            state.items[index] = action.payload;
+            state.items[index] = updatedReview;
+          }
+
+          // Update publicReviews list
+          if (updatedReview.selectedForPublic) {
+            const exists = state.publicReviews.find(
+              (r) => r.id === updatedReview.id
+            );
+            if (!exists) {
+              state.publicReviews.push(updatedReview);
+            }
+          } else {
+            state.publicReviews = state.publicReviews.filter(
+              (r) => r.id !== updatedReview.id
+            );
           }
         }
-      );
+      )
+      .addCase(toggleReviewSelection.rejected, (state, action) => {
+        state.error =
+          action.error.message || "Failed to toggle review selection";
+      });
   },
 });
 

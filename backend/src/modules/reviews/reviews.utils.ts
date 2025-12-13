@@ -14,7 +14,7 @@ export function normalizeHostawayReview(
   return {
     id: review.id.toString(),
     source: "hostaway",
-    listingId: "0", // ID not provided in review response
+    listingId: `hostaway-${review.listingName.replace(/[^a-zA-Z0-9]/g, "-").toLowerCase()}`,
     listingName: review.listingName,
     type: review.type === "guest-to-host" ? "guest-to-host" : "host-to-guest",
     status: review.status === "published" ? "published" : "pending",
