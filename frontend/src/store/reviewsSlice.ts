@@ -48,6 +48,14 @@ export const fetchAnalytics = createAsyncThunk(
   }
 );
 
+export const fetchHostawayReviews = createAsyncThunk(
+  "reviews/fetchHostawayReviews",
+  async (params: any) => {
+    const response = await api.get("/reviews/hostaway", { params });
+    return response.data;
+  }
+);
+
 export const toggleReviewSelection = createAsyncThunk(
   "reviews/toggleSelection",
   async ({
@@ -81,6 +89,18 @@ const reviewsSlice = createSlice({
       .addCase(fetchReviews.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.error.message || "Failed to fetch reviews";
+      })
+      .addCase(fetchHostawayReviews.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(fetchHostawayReviews.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.items = action.payload.data;
+        state.meta = action.payload.meta;
+      })
+      .addCase(fetchHostawayReviews.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.error.message || "Failed to fetch Hostaway reviews";
       })
       .addCase(fetchAnalytics.pending, (state) => {
         state.analyticsStatus = "loading";

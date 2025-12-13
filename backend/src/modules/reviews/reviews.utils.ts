@@ -4,40 +4,26 @@ import { HostawayReview } from "./hostaway.types";
 export function normalizeHostawayReview(
   review: HostawayReview
 ): NormalizedReview {
-  const categories: NormalizedReviewCategory[] = [];
-
-  if (review.cleanlinessRating)
-    categories.push({
-      category: "cleanliness",
-      rating: review.cleanlinessRating,
-    });
-  if (review.communicationRating)
-    categories.push({
-      category: "communication",
-      rating: review.communicationRating,
-    });
-  if (review.checkInRating)
-    categories.push({ category: "checkIn", rating: review.checkInRating });
-  if (review.accuracyRating)
-    categories.push({ category: "accuracy", rating: review.accuracyRating });
-  if (review.locationRating)
-    categories.push({ category: "location", rating: review.locationRating });
-  if (review.valueRating)
-    categories.push({ category: "value", rating: review.valueRating });
+  const categories: NormalizedReviewCategory[] = review.reviewCategory
+    ? review.reviewCategory.map((c) => ({
+        category: c.category,
+        rating: c.rating,
+      }))
+    : [];
 
   return {
     id: review.id.toString(),
     source: "hostaway",
-    listingId: review.listingMapId.toString(),
-    listingName: `Listing ${review.listingMapId}`, // Placeholder as we don't have listing details in review
-    type: review.type === "guest_to_host" ? "guest-to-host" : "host-to-guest",
-    status: review.status === "approved" ? "published" : "pending", // Simplified mapping
-    overallRating: review.rating,
+    listingId: "0", // ID not provided in review response
+    listingName: review.listingName,
+    type: review.type === "guest-to-host" ? "guest-to-host" : "host-to-guest",
+    status: review.status === "published" ? "published" : "pending",
+    overallRating: review.rating || 0,
     categories,
-    publicText: review.comment,
-    submittedAt: new Date(review.reviewDate).toISOString(),
+    publicText: review.publicReview,
+    submittedAt: new Date(review.submittedAt).toISOString(),
     guestName: review.guestName,
-    channel: review.channelName,
-    selectedForPublic: false, // Default to false, manager must approve
+    channel: "hostaway", // Channel not provided in review response
+    selectedForPublic: false,
   };
 }

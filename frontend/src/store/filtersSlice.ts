@@ -9,6 +9,7 @@ interface FiltersState {
   startDate?: string;
   endDate?: string;
   channel?: string;
+  source?: string;
   selectedForPublic?: string; // 'true' | 'false'
   search?: string;
   sortBy?: string;

@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store";
-import { fetchReviews, fetchAnalytics } from "@/store/reviewsSlice";
+import { fetchReviews, fetchAnalytics, fetchHostawayReviews } from "@/store/reviewsSlice";
 import { fetchListings } from "@/store/listingsSlice";
 import { setFilters } from "@/store/filtersSlice";
 import { ReviewsTable } from "@/components/ReviewsTable";
@@ -20,7 +20,12 @@ export default function ReviewsPage() {
   useEffect(() => {
     // Debounce could be added here, but for now relying on Redux thunk handling
     const timer = setTimeout(() => {
-      dispatch(fetchReviews(filters));
+      // If specifically filtering for Hostaway or no source is set (default), fetch live data
+      if (filters.source === "hostaway" || !filters.source) {
+         dispatch(fetchHostawayReviews(filters));
+      } else {
+         dispatch(fetchReviews(filters));
+      }
       dispatch(fetchAnalytics(filters));
     }, 300);
     return () => clearTimeout(timer);
@@ -35,6 +40,10 @@ export default function ReviewsPage() {
     dispatch(
       setFilters({ ...filters, sortBy, sortOrder: sortOrder as "asc" | "desc" })
     );
+  };
+
+  const handleFetchHostaway = () => {
+    dispatch(fetchHostawayReviews({}));
   };
 
   return (
@@ -72,7 +81,7 @@ export default function ReviewsPage() {
           </div>
 
           <select
-            className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow appearance-none"
+            className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow appearance-none cursor-pointer"
             onChange={(e) =>
               dispatch(
                 setFilters({
@@ -99,7 +108,7 @@ export default function ReviewsPage() {
           </select>
 
           <select
-            className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow appearance-none"
+            className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow appearance-none cursor-pointer"
             onChange={(e) =>
               dispatch(
                 setFilters({ ...filters, channel: e.target.value || undefined })
@@ -122,7 +131,7 @@ export default function ReviewsPage() {
           </select>
 
           <select
-            className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow appearance-none"
+            className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow appearance-none cursor-pointer"
             onChange={(e) =>
               dispatch(
                 setFilters({

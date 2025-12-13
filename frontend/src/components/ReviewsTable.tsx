@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store";
-import { fetchReviews, toggleReviewSelection } from "@/store/reviewsSlice";
+import { toggleReviewSelection } from "@/store/reviewsSlice";
 import { NormalizedReview } from "@/types";
 import { ReviewDetailModal } from "./ReviewDetailModal";
 
@@ -17,10 +17,6 @@ export function ReviewsTable() {
     null
   );
   const [isModalOpen, setIsModalOpen] = useState(false);
-
-  useEffect(() => {
-    dispatch(fetchReviews(filters));
-  }, [dispatch, filters]);
 
   const handleToggleSelection = (id: string, currentStatus: boolean) => {
     dispatch(toggleReviewSelection({ id, selectedForPublic: !currentStatus }));
@@ -108,7 +104,7 @@ export function ReviewsTable() {
                           review.selectedForPublic
                         )
                       }
-                      className={`relative inline-flex items-center h-6 rounded-full w-11 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${
+                      className={`relative inline-flex items-center h-6 rounded-full w-11 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 cursor-pointer ${
                         review.selectedForPublic
                           ? "bg-indigo-600"
                           : "bg-gray-200"
@@ -126,7 +122,7 @@ export function ReviewsTable() {
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <button
                       onClick={() => handleViewDetails(review)}
-                      className="text-indigo-600 hover:text-indigo-900 bg-indigo-50 hover:bg-indigo-100 px-3 py-1 rounded-md transition-colors"
+                      className="text-indigo-600 hover:text-indigo-900 bg-indigo-50 hover:bg-indigo-100 px-3 py-1 rounded-md transition-colors cursor-pointer"
                     >
                       View Details
                     </button>
