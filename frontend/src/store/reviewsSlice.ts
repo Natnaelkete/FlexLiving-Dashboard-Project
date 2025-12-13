@@ -158,8 +158,7 @@ const reviewsSlice = createSlice({
       })
       .addCase(fetchGoogleReviews.rejected, (state, action) => {
         state.status = "failed";
-        state.error =
-          action.error.message || "Failed to fetch Google reviews";
+        state.error = action.error.message || "Failed to fetch Google reviews";
       })
       .addCase(fetchPublicReviews.fulfilled, (state, action) => {
         state.publicReviews = action.payload.data;
