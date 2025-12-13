@@ -24,7 +24,7 @@ export function ReviewDetailModal({
     >
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
+        className="fixed inset-0 bg-black/10 transition-opacity backdrop-blur-xs"
         aria-hidden="true"
         onClick={onClose}
       ></div>
