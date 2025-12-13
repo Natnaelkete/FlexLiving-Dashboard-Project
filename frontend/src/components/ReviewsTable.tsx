@@ -32,13 +32,24 @@ export function ReviewsTable() {
     setSelectedReview(null);
   };
 
-  if (status === "loading") return <div>Loading reviews...</div>;
+  if (status === "loading") {
+    return (
+      <div className="w-full h-64 flex items-center justify-center bg-white rounded-lg shadow border border-gray-200">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-gray-500 text-sm font-medium">
+            Loading reviews...
+          </p>
+        </div>
+      </div>
+    );
+  }
   if (status === "failed") return <div>Error: {error}</div>;
 
   return (
     <>
       <div className="overflow-hidden bg-white rounded-lg shadow border border-gray-200">
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto scrollbar-hide">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
