@@ -18,10 +18,8 @@ export default function DashboardPage() {
   }, [dispatch, filters]);
 
   return (
-    <div className="space-y-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <h1 className="text-3xl font-bold text-gray-900 tracking-tight">
-        Dashboard Overview
-      </h1>
+    <div className="space-y-6">
+      <h1 className="text-2xl font-bold text-gray-900">Dashboard Overview</h1>
 
       <section>
         <h2 className="text-xl font-bold text-gray-900 mb-6">Analytics</h2>
@@ -30,10 +28,8 @@ export default function DashboardPage() {
 
       <SelectedReviews />
 
-      <section className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="p-6 border-b border-gray-100">
-          <h2 className="text-xl font-bold text-gray-900">Recent Reviews</h2>
-        </div>
+      <section>
+        <h2 className="text-xl font-bold text-gray-900 mb-4">Recent Reviews</h2>
         <ReviewsTable />
       </section>
     </div>
