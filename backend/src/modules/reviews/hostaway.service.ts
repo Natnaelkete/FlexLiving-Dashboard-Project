@@ -46,6 +46,71 @@ export class HostawayService {
     }
   }
 
+  private filterMockReviews(
+    reviews: HostawayReview[],
+    params: any
+  ): HostawayReview[] {
+    let filtered = reviews.filter((review) => {
+      // Search Filter
+      if (params.search) {
+        const searchLower = params.search.toLowerCase();
+        const matchesSearch =
+          review.guestName?.toLowerCase().includes(searchLower) ||
+          review.listingName?.toLowerCase().includes(searchLower) ||
+          review.publicReview?.toLowerCase().includes(searchLower);
+        if (!matchesSearch) return false;
+      }
+
+      // Rating Filter
+      if (
+        params.minRating &&
+        (review.rating === null || review.rating < Number(params.minRating))
+      )
+        return false;
+      if (
+        params.maxRating &&
+        (review.rating === null || review.rating > Number(params.maxRating))
+      )
+        return false;
+
+      // Date Filter
+      if (params.startDate) {
+        const reviewDate = new Date(review.submittedAt);
+        const startDate = new Date(params.startDate);
+        if (reviewDate < startDate) return false;
+      }
+      if (params.endDate) {
+        const reviewDate = new Date(review.submittedAt);
+        const endDate = new Date(params.endDate);
+        if (reviewDate > endDate) return false;
+      }
+
+      return true;
+    });
+
+    // Sorting
+    if (params.sortBy) {
+      filtered.sort((a, b) => {
+        let valA: any = a[params.sortBy as keyof HostawayReview];
+        let valB: any = b[params.sortBy as keyof HostawayReview];
+
+        if (params.sortBy === "date") {
+          valA = new Date(a.submittedAt).getTime();
+          valB = new Date(b.submittedAt).getTime();
+        } else if (params.sortBy === "rating") {
+          valA = a.rating || 0;
+          valB = b.rating || 0;
+        }
+
+        if (valA < valB) return params.sortOrder === "asc" ? -1 : 1;
+        if (valA > valB) return params.sortOrder === "asc" ? 1 : -1;
+        return 0;
+      });
+    }
+
+    return filtered;
+  }
+
   async fetchReviews(params: any): Promise<HostawayResponse> {
     try {
       const token = await this.getAccessToken();
@@ -70,9 +135,10 @@ export class HostawayService {
       // Fallback to mock data if API returns empty (Sandbox environment)
       if (!response.data.result || response.data.result.length === 0) {
         console.log("Hostaway API returned no reviews. Using mock data.");
+        const filteredMock = this.filterMockReviews(MOCK_REVIEWS, params);
         return {
           status: "success",
-          result: MOCK_REVIEWS,
+          result: filteredMock,
         };
       }
 
